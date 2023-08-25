@@ -1,0 +1,140 @@
+# action.yml
+name: 'Build Qwak Model'
+description: 'Triggers a ML model build in Qwak Cloud. Requires QWAK_API_KEY secret to be set at the repository level!'
+branding:
+  icon: 'award'
+  color: 'orange'
+
+inputs:
+  sdk-version:
+    description: 'The Qwak-SDK version required to trigger this build. [Default: latest]'
+    required: false
+
+  model-id:
+    description: 'Model ID'
+    required: true
+
+  model-path:
+    description: 'Path to the project's directory. By default Qwak searches for the `main` directory in the specified path.'
+    required: true
+
+  main-dir-name:
+    description: 'Model main directory name [Default: main]'
+    required: false
+
+  param-list:
+    description: |
+      'A list of key-value pairs representing build parameters, specified in the format NAME=VALUE, separated by comma. 
+      These parameters can be used to customize various aspects of the build process, such as the number of iterations, 
+      loss function, etc. Once set, the parameters will be saved and can be viewed later.'
+    required: false
+
+  env-vars:
+    description: |
+      'Environment variables for the build, specified in the format NAME=VALUE, separated by comma.
+      These variables can be used to set or override environment settings within the build process.
+      For example, you can define paths, system configurations, or other environment-specific details.''
+    required: false
+
+  tags:
+    description: 'One or multiple tags for the model build, separated by comma'
+    required: false
+
+  cpu:
+    description: |
+        'Number of cpus to use on the remote build. [Default (If GPU not configured): 2] 
+        DO NOT CONFIGURE GPU AND CPU TOGETHER!'
+    required: false
+
+  memory:
+    description: 'Memory to use on the remote build'
+    required: false
+
+  gpu-type:
+    description: 'Type of GPU to use on the remote build (NVIDIA_A10G, NVIDIA_K80, NVIDIA_A100, NVIDIA_V100, NVIDIA_T4).'
+    required: false
+
+  gpu-amount:
+    description: |
+      'Amount of GPU to use on the remote build. [Default: None] 
+      DO NOT CONFIGURE GPU AND CPU TOGETHER!'
+    required: false
+
+  base-image:
+    description: |
+      'Used for customizing the docker container image built for train, build and deploy. Docker images should 
+      be based on qwak images, The entrypoint or cmd of the docker image should not be changed. [Default: None]'
+    required: false
+
+  iam-role-arn:
+    description: 'Custom IAM Role ARN Qwak should assume in order to access external resources in the build process.'
+    required: false
+
+  gpu-compatible:
+    description: '[true/false] Whether to build an image that is compatible to be deployd on a GPU. [Default: false]'
+    required: false
+
+  logs-as-json:
+    description: '[true/false] Output logs as json for easier parsing [Default: true]'
+    required: false
+
+  timeout-after:
+    description: 'How many minutes to wait for the build before timing out. [Default: 30]'
+    required: false
+  
+outputs:
+  build-id:
+    description: 'The ID of the build.'
+  build-status:
+    description: 'The status of the build once it finished execution or times out.'
+  build-metrics:
+    description: 'A list of key=value pairs representing build metrics.'
+
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9.12'
+
+    - name: Install qwak-sdk
+      shell: bash
+      run: |
+        if [[ -z "${{ inputs.sdk-version }}" ]]; then
+          pip3 install qwak-sdk
+        else
+          pip3 install qwak-sdk==${{ inputs.sdk-version }} || { echo "Error: Invalid or not found Qwak-SDK version: ${{ inputs.sdk-version }}"; exit 1; }
+        fi
+
+    - name: Configure qwak-sdk
+      shell: bash
+      env:
+        QWAK_API_KEY: ${{ secrets.QWAK_API_KEY }}
+      run: |
+        if [[ -z "$QWAK_API_KEY" ]]; then
+          echo "Error: QWAK_API_KEY secret is not set. Please set it as a Repository Secret."
+          exit 1
+        fi
+        qwak configure --api-key $QWAK_API_KEY
+
+    - name: Execute build
+      shell: bash
+      env:
+        MODEL_ID: ${{ inputs.model-id }}
+        MODEL_PATH: ${{ inputs.model-path }}
+        MAIN_DIR_NAME: ${{ inputs.main-dir-name }}
+        PARAM_LIST: ${{ inputs.param-list }}
+        ENV_VARS: ${{ inputs.env-vars }}
+        TAGS: ${{ inputs.tags }}
+        CPU: ${{ inputs.cpu }}
+        MEMORY: ${{ inputs.memory }}
+        GPU_TYPE: ${{ inputs.gpu-type }}
+        GPU_AMOUNT: ${{ inputs.gpu-amount }}
+        BASE_IMAGE: ${{ inputs.base-image }}
+        IAM_ROLE_ARN: ${{ inputs.iam-role-arn }}
+        GPU_COMPATIBLE: ${{ inputs.gpu-compatible }}
+        LOGS_AS_JSON: ${{ inputs.logs-as-json }}
+        TIMEOUT_AFTER: ${{ inputs.timeout-after }}
+      run: python3 register_build.py
