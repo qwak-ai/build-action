@@ -2,6 +2,12 @@
 
 This GitHub Action triggers a machine learning model build in Qwak Cloud. It provides a seamless integration with Qwak's platform, allowing you to configure, build, and monitor your models directly from your GitHub repository.
 
+## Action flow:
+1. Trigger build using the `qwak models build` CLI command
+2. Extracts the Build ID from the command output
+3. Pulls the Build status every 10 seconds from the Qwak Cloud while still IN_PROGRESS or INITIALIZING
+4. Once finished returns Build ID, STATUS and METRICS as Action Outputs
+
 ## Requirements
 
 - A [Qwak API key](https://app.qwak.ai/qwak-admin#personal-api-keys) must be set up as a repository secret named `QWAK_API_KEY`.
@@ -10,7 +16,7 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 
 - `sdk-version`: The Qwak-SDK version required to trigger this build. Default: `latest`.
 - `model-id`: **(Required)** Model ID.
-- `model-path`: **(Required)** Path to the project's directory inside the Github Runner. By default, Qwak searches for the `main` directory in the specified path.
+- `model-path`: Path to the project's directory inside the Github Actions Runner. Default `'.'`.
 - `main-dir-name`: Model main directory name. Default: `main`.
 - `param-list`: A list of key-value pairs representing build parameters, specified in the format NAME=VALUE, separated by a comma.
 - `env-vars`: Environment variables for the build, specified in the format NAME=VALUE, separated by a comma.
