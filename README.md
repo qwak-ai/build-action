@@ -1,4 +1,4 @@
-# Build Qwak Model Action
+# Qwak Model Build Action
 
 This GitHub Action triggers a machine learning model build in Qwak Cloud. It provides a seamless integration with Qwak's platform, allowing you to configure, build, and monitor your models directly from your GitHub repository.
 
@@ -39,7 +39,7 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 
 ```yaml
 - name: Build Qwak Model
-  uses: your-username/your-repo@v1
+  uses: qwak-ai/build-action@v1
   with:
     model-id: 'your-model-id'
     model-path: 'path/to/your/model'
@@ -49,7 +49,7 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 
 ```yaml
 - name: Build Qwak Model with GPU
-  uses: your-username/your-repo@v1
+  uses: qwak-ai/build-action@v1
   with:
     model-id: 'your-model-id'
     model-path: 'path/to/your/model'
@@ -61,7 +61,7 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 
 ```yaml
 - name: Build Qwak Model with Custom Parameters
-  uses: your-username/your-repo@v1
+  uses: qwak-ai/build-action@v1
   with:
     model-id: 'your-model-id'
     model-path: 'path/to/your/model'
@@ -73,7 +73,7 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 
 ```yaml
 - name: Build Qwak Model with Timeout
-  uses: your-username/your-repo@v1
+  uses: qwak-ai/build-action@v1   
   with:
     model-id: 'your-model-id'
     model-path: 'path/to/your/model'
