@@ -15,12 +15,16 @@ inputs:
     required: true
 
   model-path:
-    description: 'Path to the project's directory. By default Qwak searches for the `main` directory in the specified path.'
-    required: true
+    description: |
+      'Path to the project's directory in the Github runner. By default Qwak searches in the 
+      working directory for the `main` directory in the specified path. [Default: "." ].' 
+    required: false
+    default: '.'
 
   main-dir-name:
-    description: 'Model main directory name [Default: main]'
+    description: 'Directory name containing the Qwak Model Python file. [Default: main]'
     required: false
+    default: 'main'
 
   param-list:
     description: |
@@ -40,25 +44,10 @@ inputs:
     description: 'One or multiple tags for the model build, separated by comma'
     required: false
 
-  cpu:
-    description: |
-        'Number of cpus to use on the remote build. [Default (If GPU not configured): 2] 
-        DO NOT CONFIGURE GPU AND CPU TOGETHER!'
+  instance:
+    description: 'The instance type to train and build the model on. The instance defines the allocated CPU or GPU compute resources as well as memory.'
     required: false
-
-  memory:
-    description: 'Memory to use on the remote build'
-    required: false
-
-  gpu-type:
-    description: 'Type of GPU to use on the remote build (NVIDIA_A10G, NVIDIA_K80, NVIDIA_A100, NVIDIA_V100, NVIDIA_T4).'
-    required: false
-
-  gpu-amount:
-    description: |
-      'Amount of GPU to use on the remote build. [Default: None] 
-      DO NOT CONFIGURE GPU AND CPU TOGETHER!'
-    required: false
+    default: 'small'
 
   base-image:
     description: |
@@ -74,13 +63,19 @@ inputs:
     description: '[true/false] Whether to build an image that is compatible to be deployd on a GPU. [Default: false]'
     required: false
 
+  environment:
+    description: 'The Qwak environment to use. For example, "dev", "staging", or "production".'
+    required: false
+
   logs-as-json:
     description: '[true/false] Output logs as json for easier parsing [Default: true]'
     required: false
+    default: 'true'
 
   timeout-after:
     description: 'How many minutes to wait for the build before timing out. [Default: 30]'
     required: false
+    default: 30
   
 outputs:
   build-id:
@@ -128,13 +123,11 @@ runs:
         PARAM_LIST: ${{ inputs.param-list }}
         ENV_VARS: ${{ inputs.env-vars }}
         TAGS: ${{ inputs.tags }}
-        CPU: ${{ inputs.cpu }}
-        MEMORY: ${{ inputs.memory }}
-        GPU_TYPE: ${{ inputs.gpu-type }}
-        GPU_AMOUNT: ${{ inputs.gpu-amount }}
+        INSTANCE: ${{ inputs.instance }}
         BASE_IMAGE: ${{ inputs.base-image }}
         IAM_ROLE_ARN: ${{ inputs.iam-role-arn }}
         GPU_COMPATIBLE: ${{ inputs.gpu-compatible }}
+        ENVIRONMENT: ${{ inputs.environment }}
         LOGS_AS_JSON: ${{ inputs.logs-as-json }}
         TIMEOUT_AFTER: ${{ inputs.timeout-after }}
       run: python3 register_build.py

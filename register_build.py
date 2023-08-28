@@ -48,25 +48,10 @@ def build_command():
     if tags:
         command.extend(["-T", tags])
 
-    # CPU
-    cpu = os.getenv('CPU')
-    if cpu:
-        command.extend(["--cpus", cpu])
-
-    # Memory
-    memory = os.getenv('MEMORY')
-    if memory:
-        command.extend(["--memory", memory])
-
-    # GPU Type
-    gpu_type = os.getenv('GPU_TYPE')
-    if gpu_type:
-        command.extend(["--gpu-type", gpu_type])
-
-    # GPU Amount
-    gpu_amount = os.getenv('GPU_AMOUNT')
-    if gpu_amount:
-        command.extend(["--gpu-amount", gpu_amount])
+    # Instance Type
+    instance = os.getenv('INSTANCE')
+    if instance:
+        command.extend(["--instance", instance])
 
     # Base Image
     base_image = os.getenv('BASE_IMAGE')
@@ -82,6 +67,11 @@ def build_command():
     gpu_compatible = os.getenv('GPU_COMPATIBLE')
     if gpu_compatible and gpu_compatible.lower() == 'true':
         command.append("--gpu-compatible")
+
+    # Environment
+    environment = os.getenv('ENVIRONMENT')
+    if environment:
+        command.extend(["--environment", environment])
 
     # Logs as JSON - default TRUE
     logs_as_json = os.getenv('LOGS_AS_JSON', 'true')

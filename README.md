@@ -10,18 +10,16 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 
 - `sdk-version`: The Qwak-SDK version required to trigger this build. Default: `latest`.
 - `model-id`: **(Required)** Model ID.
-- `model-path`: **(Required)** Path to the project's directory. By default, Qwak searches for the `main` directory in the specified path.
+- `model-path`: **(Required)** Path to the project's directory inside the Github Runner. By default, Qwak searches for the `main` directory in the specified path.
 - `main-dir-name`: Model main directory name. Default: `main`.
 - `param-list`: A list of key-value pairs representing build parameters, specified in the format NAME=VALUE, separated by a comma.
 - `env-vars`: Environment variables for the build, specified in the format NAME=VALUE, separated by a comma.
 - `tags`: One or multiple tags for the model build, separated by a comma.
-- `cpu`: Number of CPUs to use on the remote build. Default (If GPU not configured): 2.
-- `memory`: Memory to use on the remote build.
-- `gpu-type`: Type of GPU to use on the remote build (NVIDIA_A10G, NVIDIA_K80, NVIDIA_A100, NVIDIA_V100, NVIDIA_T4).
-- `gpu-amount`: Amount of GPU to use on the remote build. Default: None.
+- `instance`: [Instance sizes](https://docs-saas.qwak.com/docs/instance-sizes) allow simple selection of GPU/CPU compute and memory resources when building and deploying models. Default: `small`.
 - `base-image`: Used for customizing the Docker container image built for training, building, and deploying. Docker images should be based on Qwak images.
 - `iam-role-arn`: Custom IAM Role ARN Qwak should assume to access external resources in the build process.
 - `gpu-compatible`: Whether to build an image that is compatible to be deployed on a GPU. Default: `false`.
+- `environment`: The Qwak environment to use. For example, `dev`, `staging`, or `production`.
 - `logs-as-json`: Output logs as JSON for easier parsing. Default: `false`.
 - `timeout-after`: How many minutes to wait for the build before timing out. Default: 30.
 
@@ -35,6 +33,20 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 
 ## Example Usage
 
+Let's assume the following project structure:
+
+```bash
+.
+|
+├── main                   # Main directory containing core code
+│   ├── __init__.py        # An empty file that indicates this directory is a Python package
+│   ├── model.py           # Defines the QwakModel code
+│   └── conda.yaml         # Conda environment configurationdata
+|
+├── tests                  # Test directory
+└──
+```
+
 ### Basic Example
 
 ```yaml
@@ -42,7 +54,6 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
   uses: qwak-ai/build-action@v1
   with:
     model-id: 'your-model-id'
-    model-path: 'path/to/your/model'
 ```
 
 ### Example with GPU configuration
@@ -52,21 +63,17 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
   uses: qwak-ai/build-action@v1
   with:
     model-id: 'your-model-id'
-    model-path: 'path/to/your/model'
-    gpu-type: 'NVIDIA_V100'
-    gpu-amount: '2'
+    instance: 'gpu.t4.xl'
 ```
 
-### Example with Custom Parameters and Environment Variables
+### Example with Hyperparameters
 
 ```yaml
 - name: Build Qwak Model with Custom Parameters
   uses: qwak-ai/build-action@v1
   with:
     model-id: 'your-model-id'
-    model-path: 'path/to/your/model'
     param-list: 'iterations=1000,loss_function=MAE'
-    env-vars: 'PATH=/custom/path,CONFIG=/custom/config'
 ```
 
 ### Example with Timeout Configuration
@@ -76,13 +83,20 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
   uses: qwak-ai/build-action@v1   
   with:
     model-id: 'your-model-id'
-    model-path: 'path/to/your/model'
-    timeout-after: '60'
+    timeout-after: 60
 ```
 
-### Example with a specific Qwak SDK version
+### Trigger a build when a pull request is opened or edited
 
 ```yaml
+
+name: Build and Test ML Model on Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main  # or whichever branches you want to run this on
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -93,8 +107,11 @@ jobs:
       uses: qwak-ai/build-action@v1
       with:
         model-id: 'my-model-id'
-        model-path: 'path/to/model'
+        model-path: 'feature-store-example-project'
         sdk-version: '0.5.18'
+        instance: 'medium'
+        tags: <ml-experiment-branch>
+        iam-role-arn: 'arn:aws:iam::<account-id>:role/<role-name>'
         # other inputs as needed
 ```
 
