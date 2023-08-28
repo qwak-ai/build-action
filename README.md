@@ -36,6 +36,13 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 - `build-status`: The status of the build once it finished execution or times out.
 - `build-metrics`: **(if successful)** A list of key=value pairs representing build metrics.
 
+Output Example 
+```bash
+build-id=bc3ceeca-e4ed-48b9-8ff1-80427923f1cf
+build-status=SUCCESSFUL
+build-metrics={'val_accuracy': 0.6753646731376648}
+```
+
 
 ## Example Usage
 
