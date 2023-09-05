@@ -1,4 +1,4 @@
-# Qwak Model Build Action
+# Qwak Model `BUILD` Action
 
 This GitHub Action triggers a machine learning model build in Qwak Cloud. It provides a seamless integration with Qwak's platform, allowing you to configure, build, and monitor your models directly from your GitHub repository.
 

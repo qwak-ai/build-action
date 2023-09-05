@@ -90,6 +90,8 @@ def wait_for_build(build_id: str, timeout: int) -> Build:
     # Record the start time to track how long we've been waiting
     start_time = time.time()
 
+    current_status = None
+
     try:
         # Keep checking the build status until a timeout is reached
         while time.time() - start_time < 60 * timeout:
@@ -101,8 +103,11 @@ def wait_for_build(build_id: str, timeout: int) -> Build:
 
             verbal_build_status = build_object.build_status.name
 
-            # Print the current build status
-            print(f"Current build {build_id} status {verbal_build_status}\n")
+
+            # Print the current build status if changed
+            if verbal_build_status is not current_status:
+                print(f"Current build {build_id} status is: {verbal_build_status}\n")
+                current_status = verbal_build_status
 
             # Check if the build is successful
             if build_object.build_status is BuildStatus.SUCCESSFUL:
@@ -128,7 +133,7 @@ def wait_for_build(build_id: str, timeout: int) -> Build:
 
 if __name__ == '__main__':
 
-    timeout_for_failing = int(os.getenv('INPUT_TIMEOUT-AFTER', 30)) # Default 30 minutes
+    timeout_for_failing = int(os.getenv('INPUT_TIMEOUT_AFTER', 30)) # Default 30 minutes
  
     qwak_build_model_command = build_command()
     print("Printing the qwak cli command for debug purposes:\n", qwak_build_model_command)
@@ -150,11 +155,11 @@ if __name__ == '__main__':
         stdout, stderr = process.communicate()
 
         # Print the standard output
-        print(f"Command Output:\n{stdout}")
+        print(f"Command Output:\n\n{stdout}\n")
 
         # Check if the command was successful
         if return_code != 0:
-            print(f"An error occurred while running the qwak models build command.\n {stderr}")
+            print(f"An error occurred while running the `qwak models build` command.\n {stderr}")
             exit(1)
 
         # Extract the build ID using a regular expression - careful with the escape codes!!!
@@ -176,6 +181,9 @@ if __name__ == '__main__':
 
                 if build_object.build_status is BuildStatus.SUCCESSFUL:
                     file.write(f"build-metrics={build_object.metrics}\n")
+                else:
+                    print(f"Build failed with status {build_object.build_status.name}. Failing the GitHub Action step.")
+                    exit(1)
 
         else:
             print("Build ID not found in the command output. Please contact the Qwak team for assistance.")
@@ -192,7 +200,8 @@ if __name__ == '__main__':
                 file.write("build-status=TIMEOUT\n")
         else:
             print("Build ID not found. Cannot handle timeout exception without Build ID.")
-            exit(1)
+
+        exit(1)    
 
     except Exception as general_error:
         # Handle any other exceptions that might occur

@@ -83,7 +83,7 @@ outputs:
   build-status:
     description: 'The status of the build once it finished execution or times out.'
   build-metrics:
-    description: 'A list of key=value pairs representing build metrics.'
+    description: 'A JSON dictionary of key/value pairs representing build metrics.'
 
 
 runs:
