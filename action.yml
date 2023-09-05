@@ -1,11 +1,15 @@
 # action.yml
 name: 'Build Qwak Model'
-description: 'Triggers a ML model build in Qwak Cloud. Requires QWAK_API_KEY secret to be set at the repository level!'
+description: 'Triggers a ML model build in Qwak Cloud.'
 branding:
   icon: 'award'
   color: 'orange'
 
 inputs:
+  qwak-api-key:
+    description: Your Qwak Service API Key. Please store it as a repository secret and just reference it here.
+    required: true
+
   sdk-version:
     description: 'The Qwak-SDK version required to trigger this build. [Default: latest]'
     required: false
@@ -89,7 +93,6 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
         python-version: '3.9.12'
@@ -106,13 +109,8 @@ runs:
     - name: Configure qwak-sdk
       shell: bash
       env:
-        QWAK_API_KEY: ${{ secrets.QWAK_API_KEY }}
-      run: |
-        if [[ -z "$QWAK_API_KEY" ]]; then
-          echo "Error: QWAK_API_KEY secret is not set. Please set it as a Repository Secret."
-          exit 1
-        fi
-        qwak configure --api-key $QWAK_API_KEY
+        QWAK_API_KEY: ${{ inputs.qwak-api-key }}
+      run: 'qwak configure --api-key $QWAK_API_KEY'
 
     - name: Execute build
       shell: bash
@@ -130,4 +128,5 @@ runs:
         ENVIRONMENT: ${{ inputs.environment }}
         LOGS_AS_JSON: ${{ inputs.logs-as-json }}
         TIMEOUT_AFTER: ${{ inputs.timeout-after }}
-      run: python3 register_build.py
+      run: python3 ${{ github.action_path }}/register_build.py
+      
