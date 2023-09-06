@@ -1,0 +1,28 @@
+name: Update Latest Tag
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  update-latest-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Move tag
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        
+        # Fetch all tags
+        git fetch --tags
+
+        # Move the v1 tag to the new commit
+        git tag -fa v1 ${{ github.event.release.target_commitish }} -m "Point to the latest v1.x.x release"
+
+        # Force-push the updated v1 tag to GitHub
+        git push origin v1 --force
