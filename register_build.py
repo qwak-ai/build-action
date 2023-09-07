@@ -44,9 +44,11 @@ def build_command():
             command.extend(["-E", env_var])
 
     # Tags
-    tags = os.getenv('TAGS')
-    if tags:
-        command.extend(["-T", tags])
+    tag_list = os.getenv('TAGS')
+    if tag_list:
+        tags = tag_list.split(",")
+        for tag in tags:
+            command.extend(["-T", tag])
 
     # Instance Type
     instance = os.getenv('INSTANCE')

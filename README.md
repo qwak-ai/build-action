@@ -1,4 +1,4 @@
-# Qwak Model `BUILD` Action
+# Qwak Model `BUILD` Action (v1)
 
 This GitHub Action triggers a machine learning model build in Qwak Cloud. It provides a seamless integration with Qwak's platform, allowing you to configure, build, and monitor your models directly from your GitHub repository.
 
@@ -8,12 +8,9 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 3. Pulls the Build status every 10 seconds from the Qwak Cloud while still IN_PROGRESS or INITIALIZING
 4. Once finished returns Build ID, STATUS and METRICS as Action Outputs
 
-## Requirements
-
-- A [Qwak API key](https://app.qwak.ai/qwak-admin#personal-api-keys) must be set up as a repository secret named `QWAK_API_KEY`.
-
 ## Inputs
 
+- `qwak-api-key`: A [Qwak API key](https://app.qwak.ai/qwak-admin#personal-api-keys). Recommended to be set up as a repository secret.
 - `sdk-version`: The Qwak-SDK version required to trigger this build. Default: `latest`.
 - `model-id`: **(Required)** Model ID.
 - `model-path`: Path to the project's directory inside the Github Actions Runner. Default `'.'`.
@@ -66,6 +63,7 @@ Let's assume the following project structure:
 - name: Build Qwak Model
   uses: qwak-ai/build-action@v1
   with:
+    qwak-api-key: <your qwak key>
     model-id: 'your-model-id'
 ```
 
@@ -75,6 +73,7 @@ Let's assume the following project structure:
 - name: Build Qwak Model with GPU
   uses: qwak-ai/build-action@v1
   with:
+    qwak-api-key: <your qwak key>
     model-id: 'your-model-id'
     instance: 'gpu.t4.xl'
 ```
@@ -85,6 +84,7 @@ Let's assume the following project structure:
 - name: Build Qwak Model with Custom Parameters
   uses: qwak-ai/build-action@v1
   with:
+    qwak-api-key: <your qwak key>
     model-id: 'your-model-id'
     param-list: 'iterations=1000,loss_function=MAE'
 ```
@@ -95,6 +95,7 @@ Let's assume the following project structure:
 - name: Build Qwak Model with Timeout
   uses: qwak-ai/build-action@v1   
   with:
+    qwak-api-key: <your qwak key>
     model-id: 'your-model-id'
     timeout-after: 60
 ```
@@ -119,6 +120,7 @@ jobs:
     - name: Build Qwak Model
       uses: qwak-ai/build-action@v1
       with:
+        qwak-api-key: <your qwak key>
         model-id: 'my-model-id'
         model-path: 'feature-store-example-project'
         sdk-version: '0.5.18'

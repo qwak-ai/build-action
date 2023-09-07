@@ -7,11 +7,11 @@ on:
 
 jobs:
   update-latest-tag:
-    runs-on: ubuntu-latest
+    runs-on: [ self-hosted ]        # change with your requirede instance for example [ubuntu-latest]
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Move tag
       run: |
