@@ -80,6 +80,11 @@ def build_command():
     if logs_as_json.lower() != 'false':
         command.append("--json-logs")
 
+    # From file
+    from_file_path = os.getenv('FROM_FILE')
+    if from_file_path:
+        command.extend(["--from-file", from_file_path])
+
 
     return " ".join(command)
 

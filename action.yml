@@ -76,6 +76,10 @@ inputs:
     required: false
     default: 'true'
 
+  from-file:
+    description: 'Build model with configuration as code from the specified file. Github Action arguments will overwrite any file configs.'
+    required: false
+
   timeout-after:
     description: 'How many minutes to wait for the build before timing out. [Default: 30]'
     required: false

@@ -25,6 +25,7 @@ This GitHub Action triggers a machine learning model build in Qwak Cloud. It pro
 - `environment`: The Qwak environment to use. For example, `dev`, `staging`, or `production`.
 - `logs-as-json`: Output logs as JSON for easier parsing. Default: `false`.
 - `timeout-after`: How many minutes to wait for the build before timing out. Default: 30.
+- `from-file`: Build model with configuration as code from the specified file. Github Action arguments will overwrite any file configs.
 
 
 ## Outputs
