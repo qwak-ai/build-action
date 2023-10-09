@@ -131,6 +131,7 @@ runs:
         GPU_COMPATIBLE: ${{ inputs.gpu-compatible }}
         ENVIRONMENT: ${{ inputs.environment }}
         LOGS_AS_JSON: ${{ inputs.logs-as-json }}
+        FROM_FILE: ${{ inputs.from-file }}
         TIMEOUT_AFTER: ${{ inputs.timeout-after }}
       run: python3 ${{ github.action_path }}/register_build.py
       
