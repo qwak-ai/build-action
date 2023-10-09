@@ -11,7 +11,7 @@ inputs:
     required: true
 
   sdk-version:
-    description: 'The Qwak-SDK version required to trigger this build. [Default: latest]'
+    description: 'The Qwak-SDK version required to trigger this build, can be 0.5.X or 0.9.X. [Default: latest]'
     required: false
 
   model-id:
@@ -107,7 +107,16 @@ runs:
         if [[ -z "${{ inputs.sdk-version }}" ]]; then
           pip3 install qwak-sdk
         else
-          pip3 install qwak-sdk==${{ inputs.sdk-version }} || { echo "Error: Invalid or not found Qwak-SDK version: ${{ inputs.sdk-version }}"; exit 1; }
+          VERSION_MAJOR=$(echo "${{ inputs.sdk-version }}" | cut -d. -f2)
+          VERSION_MINOR=$(echo "${{ inputs.sdk-version }}" | cut -d. -f3)
+          
+          if [[ "$VERSION_MAJOR" -eq 5 ]]; then
+            pip3 install qwak-sdk==${{ inputs.sdk-version }}
+          elif [[ "$VERSION_MAJOR" -eq 9 ]]; then
+            pip3 install --extra-index-url https://qwak:A3RX55aNSpE8dCV@qwak.jfrog.io/artifactory/api/pypi/qwak-pypi/simple qwak-sdk==${{ inputs.sdk-version }}
+          else
+            echo "Error: Unsupported Qwak-SDK version: ${{ inputs.sdk-version }}"; exit 1;
+          fi
         fi
 
     - name: Configure qwak-sdk
